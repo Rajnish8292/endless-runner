@@ -7,11 +7,19 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Ground from "./3dObjects/ground/ground";
 import Plane from "./3dObjects/plane/plane";
 import Box from "./3dObjects/box/box";
-import { sendError } from "next/dist/server/api-utils";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 export default function Home() {
   useEffect(() => {
     // Basic Three.js setup
     const scene = new THREE.Scene();
+    new RGBELoader().load(
+      "/texture/enviroment/bloem_field_sunrise_4k.hdr",
+      (env) => {
+        env.mapping = THREE.EquirectangularReflectionMapping;
+        scene.environment = env;
+        // scene.background = env;
+      }
+    );
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -37,7 +45,7 @@ export default function Home() {
     const controls = new OrbitControls(camera, renderer.domElement);
 
     // fog
-    const fog = new THREE.FogExp2(0xffffff, 0.035);
+    const fog = new THREE.FogExp2(0xffffff, 0.015);
     scene.fog = fog;
 
     // ground
@@ -50,7 +58,6 @@ export default function Home() {
 
     // obstacles
     const box1 = new Box();
-    box1.position.set(0, 0.33, -20);
     scene.add(box1);
 
     // camera position
@@ -92,9 +99,19 @@ export default function Home() {
     window.addEventListener("keyup", keyupHandler);
 
     const animate = function () {
-      if (keys.a.pressed) plane.rotateLeft();
-      else if (keys.d.pressed) plane.rotateRight();
+      box1.update();
+      if (keys.a.pressed) {
+        plane.rotateLeft();
+        box1.moveLeft();
+        ground.moveLeft();
+      } else if (keys.d.pressed) {
+        plane.rotateRight();
+        box1.moveRight();
+        ground.moveRight();
+      }
+
       plane.update();
+      ground.update();
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     };
