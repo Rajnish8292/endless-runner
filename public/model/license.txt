@@ -1,0 +1,11 @@
+Model Information:
+* title:	Polygon-Runway's sea duck plane
+* source:	https://sketchfab.com/3d-models/polygon-runways-sea-duck-plane-9696ba99137c42b69e0b58bbbdde7be6
+* author:	Nardeol (https://sketchfab.com/Nardeol)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Polygon-Runway's sea duck plane" (https://sketchfab.com/3d-models/polygon-runways-sea-duck-plane-9696ba99137c42b69e0b58bbbdde7be6) by Nardeol (https://sketchfab.com/Nardeol) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
