@@ -5,7 +5,8 @@ class Obstacle extends THREE.Mesh {
     super(geometry, material);
     this.castShadow = true;
     this.receiveShadow = true;
-    this.position.set(0, 0, -60);
+    this.position.z = -100 + Math.random() * 100;
+    this.position.x = -50 + Math.random() * 100;
 
     this.speed = 0.5; // Target positions for smooth movement
 
@@ -16,12 +17,19 @@ class Obstacle extends THREE.Mesh {
   }
 
   update() {
-    // Reset position if obstacle passes z=10
-    if (this.position.z >= 10) {
-      this.targetZ = -60; // Reset target position
+    // Reset position if box goes out of the boundary
+    if (
+      this.position.x >= 50 ||
+      this.position.x <= -50 ||
+      this.position.z >= 50
+    ) {
+      this.position.z = -100 + Math.random() * 50;
+      this.position.x = -50 + Math.random() * 100;
+
+      this.targetX = this.position.x;
+      this.targetZ = this.position.z;
     }
     this.targetZ += this.speed; // Smoothly interpolate toward target positions
-
     this.position.x +=
       (this.targetX - this.position.x) * this.smoothFactor ** 3;
     this.position.z +=
