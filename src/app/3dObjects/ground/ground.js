@@ -3,7 +3,7 @@ import * as THREE from "three";
 class Ground extends THREE.Mesh {
   constructor() {
     const [colorMap, displacementMap, normalMap, roughnessMap] = [
-      "/texture/ground/Concrete034_2K-JPG_Color.jpg",
+      "/texture/ground/color.png",
       "/texture/ground/Concrete034_2K-JPG_Displacement.jpg",
       "/texture/ground/Concrete034_2K-JPG_NormalDX.jpg",
       "/texture/ground/Concrete034_2K-JPG_Roughness.jpg",
@@ -20,13 +20,16 @@ class Ground extends THREE.Mesh {
     const geometry = new THREE.PlaneGeometry(150, 100, 50, 50);
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
+      emissive: 0xffffff,
+      emissiveIntensity: 0.4,
       side: THREE.DoubleSide,
       fog: true,
+      // wireframe: true,
       map: colorMap,
       normalMap: normalMap,
-      displacementMap: displacementMap,
-      roughnessMap: roughnessMap,
-      displacementScale: 0.1,
+      // displacementMap: displacementMap,
+      // roughnessMap: roughnessMap,
+      // displacementScale: 0.1,
     });
     super(geometry, material);
 

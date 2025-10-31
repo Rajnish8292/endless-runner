@@ -34,24 +34,20 @@ class Plane extends THREE.Group {
       this.boundingBox.copy(box);
     });
 
-    this.rotation.y = Math.PI;
-    this.velocity = { x: 0, y: 0, z: 0 };
-    this.position.set(0, 0.5, 0);
+    // this.rotation.y = Math.PI / 2;
+    this.position.set(0, 1, 0);
   }
 
   update() {
     // Update plane position based on velocity
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
-    this.position.z += this.velocity.z;
     this.rotation.z *= 0.95; // Dampen rotation over time
   }
 
   rotateRight() {
-    this.rotation.z += (Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
+    this.rotation.z += (-Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
   }
   rotateLeft() {
-    this.rotation.z += (-Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
+    this.rotation.z += (Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
   }
   getBoundingBox() {
     // Update matrix before computing bounds

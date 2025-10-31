@@ -13,7 +13,8 @@ class Obstacle extends THREE.Mesh {
     this.targetX = this.position.x;
     this.targetZ = this.position.z;
 
-    this.smoothFactor = 0.4; // Adjust for smoothing (smaller = smoother)
+    this.smoothFactor = 0.4;
+    this.name = null;
   }
 
   update() {
@@ -23,9 +24,8 @@ class Obstacle extends THREE.Mesh {
       this.position.x <= -50 ||
       this.position.z >= 50
     ) {
-      this.position.z = -100 + Math.random() * 50;
+      this.position.z = -100 + Math.random() * 40;
       this.position.x = -50 + Math.random() * 100;
-
       this.targetX = this.position.x;
       this.targetZ = this.position.z;
     }

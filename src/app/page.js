@@ -1,26 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import Ground from "./3dObjects/ground/ground";
 import Plane from "./3dObjects/plane/plane";
 import Box from "./3dObjects/box/box";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-import Obstacle from "./3dObjects/obstacle/obstacle";
+import Ball from "./3dObjects/ball/Ball";
+
 export default function Home() {
+  const hitCountRef = useRef(0);
+  const hitCountContRef = useRef(null);
   useEffect(() => {
     // Basic Three.js setup
     const scene = new THREE.Scene();
-    // new RGBELoader().load(
-    //   "/texture/enviroment/bloem_field_sunrise_4k.hdr",
-    //   (env) => {
-    //     env.mapping = THREE.EquirectangularReflectionMapping;
-    //     scene.environment = env;
-    //   }
-    // );
-    // scene.environmentIntensity = 0.1;
+
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -40,12 +35,25 @@ export default function Home() {
     scene.add(hemisphereLight);
     const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
     sun.position.set(8, 2, -7);
-    // const directionalLight = new THREE.DirectionalLight(0xcdc1c5, 0.9);
-    // directionalLight.position.set(0, 2, 0);
-    // scene.add(directionalLight);
+    scene.add(sun);
+
     const ambientLight = new THREE.AmbientLight(0xcdc1c5, 0.9);
     scene.add(ambientLight);
-    scene.add(sun);
+
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(0, 3, 5);
+    // spotLight.map = new THREE.TextureLoader().load(url);
+
+    // spotLight.castShadow = true;
+
+    // spotLight.shadow.mapSize.width = 1024;
+    // spotLight.shadow.mapSize.height = 1024;
+
+    // spotLight.shadow.camera.near = 500;
+    // spotLight.shadow.camera.far = 4000;
+    // spotLight.shadow.camera.fov = 30;
+
+    scene.add(spotLight);
 
     // orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -65,13 +73,18 @@ export default function Home() {
     // obstacles
     const obstacles = [];
     for (let i = 0; i < 10; i++) {
-      const box = new Box();
+      // const box = new Box();
+      const box = new Ball();
+      box.name = `obstacle-${i + 1}`;
       scene.add(box);
       obstacles.push(box);
     }
 
+    // rotate plane wings
+    let planeWing = null;
+
     // camera position
-    camera.position.set(0, 2.75, 6);
+    camera.position.set(0, 4, 6);
     camera.lookAt(0, 0, 0);
 
     // key press events
@@ -108,10 +121,29 @@ export default function Home() {
     window.addEventListener("keydown", keydownHandler);
     window.addEventListener("keyup", keyupHandler);
 
+    // keep track of previously collided obstacle
+    let prevcollidedObstacle = null;
+
     const animate = function () {
+      // rotate plane fans
+      // if (!planeWing) {
+      //   if (plane.children[0]) {
+      //     plane.traverse((node) => {
+      //       if (node.isObject3D && node.name == "Plane003") {
+      //         planeWing = node;
+      //       }
+      //     });
+      //   }
+      // } else {
+      //   planeWing.rotation.z += 0.05;
+      // }
+
+      // update every obstacle
       obstacles.forEach((obstacle) => {
         obstacle.update();
       });
+
+      // if key a pressed move to left
       if (keys.a.pressed) {
         plane.rotateLeft();
         ground.moveLeft();
@@ -119,6 +151,7 @@ export default function Home() {
           obstacle.moveLeft();
         });
       } else if (keys.d.pressed) {
+        // if key d presses move to right
         plane.rotateRight();
         ground.moveRight();
         obstacles.forEach((obstacle) => {
@@ -126,14 +159,26 @@ export default function Home() {
         });
       }
 
+      // udpate plane and ground with every frame
       plane.update();
       ground.update();
 
+      // check for collision between plane and obstacles
       obstacles.forEach((obstacle) => {
         const planeBoundingBox = plane.getBoundingBox();
         const obstacleBoundingBox = obstacle.getBoundingBox();
         if (planeBoundingBox.max.x != -Infinity) {
           if (planeBoundingBox.intersectsBox(obstacleBoundingBox)) {
+            // setHitCount(hitCount + 1);
+            if (
+              !prevcollidedObstacle ||
+              prevcollidedObstacle.name != obstacle.name
+            ) {
+              console.log(prevcollidedObstacle?.name, obstacle.name);
+              hitCountRef.current++;
+              hitCountContRef.current.innerHTML = hitCountRef.current;
+              prevcollidedObstacle = obstacle;
+            }
           }
         }
       });
@@ -147,5 +192,11 @@ export default function Home() {
       document.body.removeChild(renderer.domElement);
     };
   });
-  return <></>;
+  return (
+    <>
+      <div style={{ position: "fixed", top: "50px", right: "50px" }}>
+        <h1 ref={hitCountContRef}>0</h1>
+      </div>
+    </>
+  );
 }
