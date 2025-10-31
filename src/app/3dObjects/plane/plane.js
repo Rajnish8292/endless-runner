@@ -52,6 +52,7 @@ class Plane extends THREE.Group {
   getBoundingBox() {
     // Update matrix before computing bounds
     this.updateMatrixWorld(true);
+    // this.updateWorldMatrix(true, true);
     return this.boundingBox.clone().applyMatrix4(this.matrixWorld);
   }
 }

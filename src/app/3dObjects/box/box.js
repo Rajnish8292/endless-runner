@@ -15,6 +15,9 @@ class Box extends Obstacle {
   }
 
   getBoundingBox() {
+    // this.updateWorldMatrix(true, true);
+    this.updateMatrixWorld(true);
+
     return new THREE.Box3().setFromObject(this);
   }
 }

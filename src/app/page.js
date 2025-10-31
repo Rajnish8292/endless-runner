@@ -40,21 +40,6 @@ export default function Home() {
     const ambientLight = new THREE.AmbientLight(0xcdc1c5, 0.9);
     scene.add(ambientLight);
 
-    const spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.position.set(0, 3, 5);
-    // spotLight.map = new THREE.TextureLoader().load(url);
-
-    // spotLight.castShadow = true;
-
-    // spotLight.shadow.mapSize.width = 1024;
-    // spotLight.shadow.mapSize.height = 1024;
-
-    // spotLight.shadow.camera.near = 500;
-    // spotLight.shadow.camera.far = 4000;
-    // spotLight.shadow.camera.fov = 30;
-
-    scene.add(spotLight);
-
     // orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -73,18 +58,16 @@ export default function Home() {
     // obstacles
     const obstacles = [];
     for (let i = 0; i < 10; i++) {
-      // const box = new Box();
-      const box = new Ball();
-      box.name = `obstacle-${i + 1}`;
+      const box = new Box();
       scene.add(box);
       obstacles.push(box);
     }
 
     // rotate plane wings
-    let planeWing = null;
+    let planePropeller = null;
 
     // camera position
-    camera.position.set(0, 4, 6);
+    camera.position.set(0, 3, 6);
     camera.lookAt(0, 0, 0);
 
     // key press events
@@ -123,24 +106,25 @@ export default function Home() {
 
     // keep track of previously collided obstacle
     let prevcollidedObstacle = null;
+    let activeCollision = new Set();
 
     const animate = function () {
       // rotate plane fans
-      // if (!planeWing) {
-      //   if (plane.children[0]) {
-      //     plane.traverse((node) => {
-      //       if (node.isObject3D && node.name == "Plane003") {
-      //         planeWing = node;
-      //       }
-      //     });
-      //   }
-      // } else {
-      //   planeWing.rotation.z += 0.05;
-      // }
+      if (!planePropeller) {
+        if (plane.children[0]) {
+          plane.traverse((node) => {
+            if (node.name.includes("Plane012_wood001_0")) {
+              planePropeller = node;
+            }
+          });
+        }
+      } else {
+        planePropeller.rotation.y += 0.5;
+      }
 
       // update every obstacle
       obstacles.forEach((obstacle) => {
-        obstacle.update();
+        obstacle.update(obstacles);
       });
 
       // if key a pressed move to left
@@ -164,23 +148,29 @@ export default function Home() {
       ground.update();
 
       // check for collision between plane and obstacles
+
       obstacles.forEach((obstacle) => {
+        plane.updateMatrixWorld(true);
         const planeBoundingBox = plane.getBoundingBox();
+        obstacle.updateMatrixWorld(true);
         const obstacleBoundingBox = obstacle.getBoundingBox();
         if (planeBoundingBox.max.x != -Infinity) {
           if (planeBoundingBox.intersectsBox(obstacleBoundingBox)) {
-            // setHitCount(hitCount + 1);
-            if (
-              !prevcollidedObstacle ||
-              prevcollidedObstacle.name != obstacle.name
-            ) {
-              console.log(prevcollidedObstacle?.name, obstacle.name);
+            if (!activeCollision.has(obstacle.name)) {
+              console.log(activeCollision);
               hitCountRef.current++;
               hitCountContRef.current.innerHTML = hitCountRef.current;
-              prevcollidedObstacle = obstacle;
+              activeCollision.add(obstacle.name);
             }
           }
+        } else {
+          // Remove obstacles that are no longer colliding
+          if (activeCollision.has(obstacle.name)) {
+            activeCollision.delete(obstacle.name);
+          }
         }
+
+        // console.log(activeCollision);
       });
 
       requestAnimationFrame(animate);
@@ -191,11 +181,13 @@ export default function Home() {
     return () => {
       document.body.removeChild(renderer.domElement);
     };
-  });
+  }, []);
   return (
     <>
       <div style={{ position: "fixed", top: "50px", right: "50px" }}>
-        <h1 ref={hitCountContRef}>0</h1>
+        <h1>
+          Collision detected : <span ref={hitCountContRef}>0</span>
+        </h1>
       </div>
     </>
   );

@@ -13,10 +13,11 @@ class Ball extends Obstacle {
     });
 
     super(geometry, material);
-    this.position.y = 4;
+    this.position.y = 2.75;
   }
 
   getBoundingBox() {
+    this.updateWorldMatrix(true, false);
     return new THREE.Box3().setFromObject(this);
   }
 }
