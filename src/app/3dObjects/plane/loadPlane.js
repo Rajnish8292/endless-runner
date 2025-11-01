@@ -1,4 +1,3 @@
-import { resolve } from "styled-jsx/css";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 const LoadPlane = new Promise((resolve, reject) => {
@@ -7,7 +6,7 @@ const LoadPlane = new Promise((resolve, reject) => {
     "/model/sopwith.glb",
     (gltf) => {
       const plane = gltf.scene;
-      plane.scale.set(0.01, 0.01, 0.01);
+      plane.scale.set(0.02, 0.02, 0.02);
       plane.rotateY(Math.PI);
       resolve(plane);
     },

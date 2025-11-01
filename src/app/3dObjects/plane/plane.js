@@ -35,7 +35,7 @@ class Plane extends THREE.Group {
     });
 
     // this.rotation.y = Math.PI / 2;
-    this.position.set(0, 1, 0);
+    this.position.set(0, 2, 0);
   }
 
   update() {
@@ -49,6 +49,7 @@ class Plane extends THREE.Group {
   rotateLeft() {
     this.rotation.z += (Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
   }
+  moveUp() {}
   getBoundingBox() {
     // Update matrix before computing bounds
     this.updateMatrixWorld(true);

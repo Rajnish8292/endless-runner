@@ -42,6 +42,9 @@ export default function Home() {
 
     // orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
+    // Lock orbit controls for gameplay camera behavior
+    controls.enablePan = false;
+    controls.enableRotate = false;
 
     // fog
     const fog = new THREE.FogExp2(0xffffff, 0.03);
@@ -58,7 +61,7 @@ export default function Home() {
     // obstacles
     const obstacles = [];
     for (let i = 0; i < 10; i++) {
-      const box = new Box();
+      const box = new Ball();
       scene.add(box);
       obstacles.push(box);
     }
@@ -66,9 +69,11 @@ export default function Home() {
     // rotate plane wings
     let planePropeller = null;
 
-    // camera position
-    camera.position.set(0, 3, 6);
-    camera.lookAt(0, 0, 0);
+    // initial camera position: place camera slightly behind and above the plane
+    // so the user can easily see what's in front of the plane.
+    camera.position.set(0, 7, 10); // x, y, z (behind the plane on +z)
+    // look a bit ahead of the plane (along -z) so upcoming obstacles are visible
+    camera.lookAt(0, 2, -20);
 
     // key press events
     const keys = {
@@ -126,6 +131,23 @@ export default function Home() {
       obstacles.forEach((obstacle) => {
         obstacle.update(obstacles);
       });
+
+      // Make camera follow the plane horizontally and stay slightly above/behind it
+      // so the player has a consistent forward view.
+      if (plane) {
+        // Smooth follow (simple lerp) to avoid jitter
+        const followX = plane.position.x;
+        const followY = plane.position.y + 3; // a bit above the plane
+        const followZ = plane.position.z + 10; // behind the plane on +z
+
+        camera.position.x += (followX - camera.position.x) * 0.1;
+        camera.position.y += (followY - camera.position.y) * 0.1;
+        camera.position.z += (followZ - camera.position.z) * 0.1;
+
+        // Look ahead of the plane so obstacles coming from -z are visible
+        const lookAtZ = plane.position.z - 30;
+        camera.lookAt(plane.position.x, plane.position.y, lookAtZ);
+      }
 
       // if key a pressed move to left
       if (keys.a.pressed) {

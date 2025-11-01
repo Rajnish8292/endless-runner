@@ -11,7 +11,6 @@ class Box extends Obstacle {
       specular: 0x222222, // optional subtle highlight
     });
     super(geometry, material);
-    this.position.y = 2.2;
   }
 
   getBoundingBox() {

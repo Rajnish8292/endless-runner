@@ -7,8 +7,13 @@ class Obstacle extends THREE.Mesh {
     this.receiveShadow = true;
     this.position.z = -100 + Math.random() * 100;
     this.position.x = -50 + Math.random() * 100;
+    this.position.y = 5;
+    this.speed = 0.2 + Math.random() * 0.5;
 
-    this.speed = 0.5; // Target positions for smooth movement
+    this.velocityY = 0.25 + Math.random() * 0.3;
+    this.gravity = -0.01;
+    this.groundY = 2;
+    this.bounceFactor = 0.9;
 
     this.targetX = this.position.x;
     this.targetZ = this.position.z;
@@ -37,12 +42,24 @@ class Obstacle extends THREE.Mesh {
       this.position.x = x;
       this.targetX = this.position.x;
       this.targetZ = this.position.z;
+      this.position.y = 5;
+      this.speed = 0.2 + Math.random() * 0.5;
+
+      this.velocityY = 0.25 + Math.random() * 0.3;
     }
     this.targetZ += this.speed; // Smoothly interpolate toward target positions
     this.position.x +=
       (this.targetX - this.position.x) * this.smoothFactor ** 3;
     this.position.z +=
       (this.targetZ - this.position.z) * this.smoothFactor ** 3;
+
+    this.velocityY += this.gravity;
+    this.position.y += this.velocityY;
+
+    if (this.position.y <= this.groundY) {
+      this.position.y = this.groundY;
+      this.velocityY = -this.velocityY * this.bounceFactor;
+    }
   }
 
   getNonOverlappingPosition(obstacles, minDistance = 5) {
