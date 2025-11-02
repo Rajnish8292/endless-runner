@@ -29,7 +29,7 @@ class Sun extends THREE.Group {
     this.sunsetSpeed = 0.5;
   }
   update() {
-    this.position.y = Math.max(50, this.position.y - this.sunsetSpeed);
+    this.position.y = Math.max(-50, this.position.y - this.sunsetSpeed);
     if (this.position.y == 50) {
       //   this.reset();
     }

@@ -63,11 +63,28 @@ class Area extends THREE.Group {
   }
   moveLeft() {
     if (this.speed <= 0) this.speed = 0;
-    this.position.x += this.speed;
+    this.groups.forEach((group) => {
+      const xPos = this.position.x + group.position.x;
+      group.position.x += this.speed;
+      if (xPos > 250) {
+        group.position.x = -250;
+      } else if (xPos < -250) {
+        group.position.x = 250;
+      }
+    });
   }
   moveRight() {
     if (this.speed <= 0) this.speed = 0;
-    this.position.x -= this.speed;
+
+    this.groups.forEach((group) => {
+      const xPos = this.position.x + group.position.x;
+      group.position.x -= this.speed;
+      if (xPos > 250) {
+        group.position.x = -250;
+      } else if (xPos < -250) {
+        group.position.x = 250;
+      }
+    });
   }
 }
 

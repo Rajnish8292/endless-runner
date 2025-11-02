@@ -48,7 +48,7 @@ export default function Home() {
     const sun = new Sun();
     scene.add(sun);
     // lights
-    // var hemisphereLight = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
+    // var hemisphereLight = new THREE.HemisphereLight(0xffff88, 0x000000, 0.9);
     // scene.add(hemisphereLight);
     // const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
     // sun.position.set(8, 2, -7);
@@ -297,6 +297,8 @@ export default function Home() {
       areas.forEach((area) => {
         area.update();
       });
+      if (ground.speed != 0) fog.density += 0.000001;
+
       sun.update();
       plane.update();
       ground.update();
