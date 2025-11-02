@@ -34,8 +34,9 @@ class Plane extends THREE.Group {
       this.boundingBox.copy(box);
     });
 
-    // this.rotation.y = Math.PI / 2;
     this.position.set(0, 2, 0);
+    this.planePropeller = null;
+    this.propellerRotationSpeed = 0.5;
   }
 
   update() {
@@ -49,7 +50,42 @@ class Plane extends THREE.Group {
   rotateLeft() {
     this.rotation.z += (Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
   }
-  moveUp() {}
+  moveUp() {
+    const targetY = 15;
+    this.position.y += (targetY - this.position.y) * 0.4 ** 3;
+  }
+  moveDown() {
+    const targetY = 0.5;
+    this.position.y += (targetY - this.position.y) * 0.4 ** 3;
+  }
+  rotateUp() {
+    const targetRotation = Math.PI / 8;
+    this.rotation.x += (targetRotation - this.rotation.x) * 0.4 ** 2;
+  }
+  rotateDown() {
+    const targetRotation = -Math.PI / 8;
+    this.rotation.x += (targetRotation - this.rotation.x) * 0.4 ** 2;
+  }
+  rotateXNormal() {
+    const targetRotation = 0;
+    this.rotation.x += (targetRotation - this.rotation.x) * 0.4 ** 3;
+  }
+  flapUp() {}
+  flapDown() {}
+  rotatePropeller() {
+    if (this.propellerRotationSpeed <= 0) this.propellerRotationSpeed = 0;
+    if (!this.planePropeller) {
+      if (this.children[0]) {
+        this.traverse((node) => {
+          if (node.name.includes("Plane012_wood001_0")) {
+            this.planePropeller = node;
+          }
+        });
+      }
+    } else {
+      this.planePropeller.rotation.y += this.propellerRotationSpeed;
+    }
+  }
   getBoundingBox() {
     // Update matrix before computing bounds
     this.updateMatrixWorld(true);

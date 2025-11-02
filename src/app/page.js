@@ -8,6 +8,20 @@ import Ground from "./3dObjects/ground/ground";
 import Plane from "./3dObjects/plane/plane";
 import Box from "./3dObjects/box/box";
 import Ball from "./3dObjects/ball/Ball";
+import Sun from "./3dObjects/sun/sun";
+import {
+  ObstacleGroup1,
+  ObstacleGroup2,
+  ObstacleGroup3,
+  ObstacleGroup4,
+  ObstacleGroup5,
+  ObstacleGroup6,
+  ObstacleGroup7,
+  ObstacleGroup8,
+  ObstacleGroup9,
+  ObstacleGroup10,
+} from "./3dObjects/obstacleGroup/obstacleGroups";
+import Area from "./3dObjects/area/area1";
 
 export default function Home() {
   const hitCountRef = useRef(0);
@@ -26,16 +40,22 @@ export default function Home() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.setClearColor(0xfffafa);
+    renderer.setClearColor(0xffffff);
 
     document.body.appendChild(renderer.domElement);
 
-    // lights
-    var hemisphereLight = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
-    scene.add(hemisphereLight);
-    const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
-    sun.position.set(8, 2, -7);
+    //sun
+    const sun = new Sun();
     scene.add(sun);
+    // lights
+    // var hemisphereLight = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
+    // scene.add(hemisphereLight);
+    // const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
+    // sun.position.set(8, 2, -7);
+    // scene.add(sun);
+    // const highlight = new THREE.DirectionalLight(0xffffff, 0.5);
+    // highlight.position.set(10, 10, 10);
+    // scene.add(highlight);
 
     const ambientLight = new THREE.AmbientLight(0xcdc1c5, 0.9);
     scene.add(ambientLight);
@@ -43,11 +63,12 @@ export default function Home() {
     // orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
     // Lock orbit controls for gameplay camera behavior
-    controls.enablePan = false;
-    controls.enableRotate = false;
+    // controls.enablePan = false;
+    // controls.enableRotate = false;
 
     // fog
-    const fog = new THREE.FogExp2(0xffffff, 0.03);
+    const fog = new THREE.FogExp2(0xffffff, 0.003);
+    // const fog = new THREE.Fog(0xffffff, 90, 100);
     scene.fog = fog;
 
     // ground
@@ -60,19 +81,101 @@ export default function Home() {
 
     // obstacles
     const obstacles = [];
-    for (let i = 0; i < 10; i++) {
-      const box = new Ball();
-      scene.add(box);
-      obstacles.push(box);
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   const box = new Ball();
+    //   scene.add(box);
+    //   obstacles.push(box);
+    // }
+
+    // const g = new ObstacleGroup9();
+    // scene.add(g);
+    // g.position.z = -50;
+    // let speed
+    const group1 = [
+      new ObstacleGroup1(),
+      new ObstacleGroup2(),
+      new ObstacleGroup3(),
+      new ObstacleGroup1(),
+      new ObstacleGroup2(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup2(),
+      new ObstacleGroup2(),
+      new ObstacleGroup2(),
+    ];
+    const group2 = [
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup3(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup3(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+    ];
+    const group3 = [
+      new ObstacleGroup5(),
+      new ObstacleGroup5(),
+      new ObstacleGroup4(),
+      new ObstacleGroup5(),
+      new ObstacleGroup5(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup4(),
+      new ObstacleGroup5(),
+      new ObstacleGroup5(),
+      new ObstacleGroup5(),
+    ];
+
+    const group4 = [
+      new ObstacleGroup6(),
+      new ObstacleGroup6(),
+      new ObstacleGroup10(),
+      new ObstacleGroup6(),
+      new ObstacleGroup6(),
+      new ObstacleGroup10(),
+      new ObstacleGroup10(),
+      new ObstacleGroup10(),
+      new ObstacleGroup10(),
+      new ObstacleGroup6(),
+      new ObstacleGroup6(),
+      new ObstacleGroup6(),
+    ];
+    // const area1 = new Area(group1);
+    // scene.add(area1);
+    // area1.position.z = -400;
+    // const area2 = new Area(group2);
+    // scene.add(area2);
+    // area2.position.z = -300;
+    // const area3 = new Area(group3);
+    // scene.add(area3);
+    // area3.position.z = -200;
+    // const area4 = new Area(group4);
+    // scene.add(area4);
+    // area3.position.z = -100;
+    const areas = [
+      new Area(group1),
+      new Area(group2),
+      new Area(group3),
+      new Area(group4),
+    ];
+
+    areas.forEach((area, index) => {
+      area.position.z = -(index + 1) * 100;
+      scene.add(area);
+    });
 
     // rotate plane wings
     let planePropeller = null;
 
-    // initial camera position: place camera slightly behind and above the plane
-    // so the user can easily see what's in front of the plane.
-    camera.position.set(0, 7, 10); // x, y, z (behind the plane on +z)
-    // look a bit ahead of the plane (along -z) so upcoming obstacles are visible
+    camera.position.set(0, 7, 10);
     camera.lookAt(0, 2, -20);
 
     // key press events
@@ -81,6 +184,12 @@ export default function Home() {
         pressed: false,
       },
       d: {
+        pressed: false,
+      },
+      w: {
+        pressed: false,
+      },
+      s: {
         pressed: false,
       },
     };
@@ -93,6 +202,11 @@ export default function Home() {
         case "KeyD":
           keys.d.pressed = true;
           break;
+        case "KeyW":
+          keys.w.pressed = true;
+          break;
+        case "KeyS":
+          keys.s.pressed = true;
       }
     };
     const keyupHandler = (event) => {
@@ -103,6 +217,11 @@ export default function Home() {
         case "KeyD":
           keys.d.pressed = false;
           break;
+        case "KeyW":
+          keys.w.pressed = false;
+          break;
+        case "KeyS":
+          keys.s.pressed = false;
       }
     };
 
@@ -110,35 +229,21 @@ export default function Home() {
     window.addEventListener("keyup", keyupHandler);
 
     // keep track of previously collided obstacle
-    let prevcollidedObstacle = null;
     let activeCollision = new Set();
 
     const animate = function () {
       // rotate plane fans
-      if (!planePropeller) {
-        if (plane.children[0]) {
-          plane.traverse((node) => {
-            if (node.name.includes("Plane012_wood001_0")) {
-              planePropeller = node;
-            }
-          });
-        }
-      } else {
-        planePropeller.rotation.y += 0.5;
-      }
-
+      plane.rotatePropeller();
       // update every obstacle
       obstacles.forEach((obstacle) => {
         obstacle.update(obstacles);
       });
 
       // Make camera follow the plane horizontally and stay slightly above/behind it
-      // so the player has a consistent forward view.
       if (plane) {
-        // Smooth follow (simple lerp) to avoid jitter
         const followX = plane.position.x;
-        const followY = plane.position.y + 3; // a bit above the plane
-        const followZ = plane.position.z + 10; // behind the plane on +z
+        const followY = plane.position.y + 3;
+        const followZ = plane.position.z + 10;
 
         camera.position.x += (followX - camera.position.x) * 0.1;
         camera.position.y += (followY - camera.position.y) * 0.1;
@@ -156,6 +261,9 @@ export default function Home() {
         obstacles.forEach((obstacle) => {
           obstacle.moveLeft();
         });
+        areas.forEach((area) => {
+          area.moveLeft();
+        });
       } else if (keys.d.pressed) {
         // if key d presses move to right
         plane.rotateRight();
@@ -163,9 +271,33 @@ export default function Home() {
         obstacles.forEach((obstacle) => {
           obstacle.moveRight();
         });
+        areas.forEach((area) => {
+          area.moveRight();
+        });
+      } else if (keys.w.pressed) {
+        plane.rotateUp();
+        plane.moveUp();
+      } else if (keys.s.pressed) {
+        plane.rotateDown();
+        plane.moveDown();
+      }
+
+      if (!keys.w.pressed) {
+        plane.rotateXNormal();
+      } else if (!keys.s.pressed) {
+        plane.rotateXNormal();
       }
 
       // udpate plane and ground with every frame
+      ground.speed -= 0.00002;
+      plane.propellerRotationSpeed -= 0.00015;
+      areas.forEach((area) => {
+        area.speed -= 0.0005;
+      });
+      areas.forEach((area) => {
+        area.update();
+      });
+      sun.update();
       plane.update();
       ground.update();
 
@@ -179,7 +311,6 @@ export default function Home() {
         if (planeBoundingBox.max.x != -Infinity) {
           if (planeBoundingBox.intersectsBox(obstacleBoundingBox)) {
             if (!activeCollision.has(obstacle.name)) {
-              console.log(activeCollision);
               hitCountRef.current++;
               hitCountContRef.current.innerHTML = hitCountRef.current;
               activeCollision.add(obstacle.name);
@@ -208,7 +339,7 @@ export default function Home() {
     <>
       <div style={{ position: "fixed", top: "50px", right: "50px" }}>
         <h1>
-          Collision detected : <span ref={hitCountContRef}>0</span>
+          <span ref={hitCountContRef}></span>
         </h1>
       </div>
     </>
