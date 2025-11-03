@@ -27,10 +27,13 @@ import { AnimatePresence } from "framer-motion";
 export default function Home() {
   const [collisionCount, setCollisionCount] = useState(0);
   const [restartGame, setRestartGame] = useState(() => () => {});
+  const [isBatteryDrained, setIsBatteryDrained] = useState(false);
   const gameSetting = useRef({
     isPaused: false,
     isEnd: false,
   });
+
+  const isResetting = useRef(false);
   useEffect(() => {
     // Basic Three.js setup
     const scene = new THREE.Scene();
@@ -291,6 +294,37 @@ export default function Home() {
       }
     }
 
+    //  ground.speed = 0.048;
+    //   areas.forEach((area) => {
+    //     area.speed = 1;
+    //   });
+    //   plane.propellerRotationSpeed = 0.5;
+    //   sun.position.y = 500;
+
+    const updateDynamic = () => {
+      if (!isResetting.current) {
+        sun.sunsetSpeed = 0.5;
+        ground.speed -= 0.00002;
+        plane.propellerRotationSpeed -= 0.00015;
+        areas.forEach((area) => {
+          area.speed -= 0.0005;
+        });
+      } else {
+        sun.sunsetSpeed = -2;
+        ground.speed = Math.min(0.048, ground.speed + 0.02);
+        plane.propellerRotationSpeed = Math.min(
+          0.5,
+          plane.propellerRotationSpeed + 0.05
+        );
+        areas.forEach((area) => {
+          area.speed = Math.min(1, area.speed + 0.05);
+        });
+        if (sun.position.y >= 500) {
+          isResetting.current = false;
+        }
+      }
+    };
+
     camera.position.set(0, 7, 10);
     camera.lookAt(0, 2, -20);
 
@@ -346,13 +380,8 @@ export default function Home() {
     // restart game function
     let restartGame = () => {
       // reset game enviroment
-      ground.speed = 0.048;
-      areas.forEach((area) => {
-        area.speed = 1;
-      });
-      plane.propellerRotationSpeed = 0.5;
-      sun.position.y = 500;
 
+      isResetting.current = true;
       gameSetting.current.isEnd = false;
       // reset z position of areas
       areas.forEach((area, index) => {
@@ -366,6 +395,7 @@ export default function Home() {
       // reset isCollided prop of every group
 
       setCollisionCount(0);
+      setIsBatteryDrained(false);
       animate();
     };
     setRestartGame(() => restartGame);
@@ -417,6 +447,9 @@ export default function Home() {
         plane.flapsNormal();
       }
 
+      // check if sun sets or not
+      if (sun.position.y <= -50) setIsBatteryDrained((prev) => !prev);
+
       // reduce the velocity as sun goes down
       ground.speed -= 0.00002;
       plane.propellerRotationSpeed -= 0.00015;
@@ -433,6 +466,7 @@ export default function Home() {
       sun.update();
       plane.update();
       ground.update();
+      updateDynamic();
 
       // check for collision using bounding sphere
       const planePos = new THREE.Vector3();
@@ -461,12 +495,7 @@ export default function Home() {
 
               // if collided object is booster then reset the velocity of ground, obstacles and areas and reset y position of sun
               if (group.name == "booster") {
-                ground.speed = 0.048;
-                areas.forEach((area) => {
-                  area.speed = 1;
-                });
-                plane.propellerRotationSpeed = 0.5;
-                sun.position.y = 500;
+                isResetting.current = true;
               } else {
                 setCollisionCount((prev) => {
                   if (prev >= 3) gameSetting.current.isEnd = true;
@@ -500,7 +529,9 @@ export default function Home() {
         <p>Lives Left : {Math.max(0, 3 - collisionCount)}</p>
       </div>
       <AnimatePresence>
-        {collisionCount >= 4 && <PlayAgain restartGame={restartGame} />}
+        {(collisionCount >= 4 || isBatteryDrained) && (
+          <PlayAgain restartGame={restartGame} />
+        )}
       </AnimatePresence>
     </>
   );
