@@ -6,8 +6,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 import Ground from "./3dObjects/ground/ground";
 import Plane from "./3dObjects/plane/plane";
-import Box from "./3dObjects/box/box";
-import Ball from "./3dObjects/ball/Ball";
+
 import Sun from "./3dObjects/sun/sun";
 import {
   ObstacleGroup1,
@@ -18,14 +17,20 @@ import {
   ObstacleGroup6,
   ObstacleGroup7,
   ObstacleGroup8,
-  ObstacleGroup9,
   ObstacleGroup10,
 } from "./3dObjects/obstacleGroup/obstacleGroups";
+import Booster from "./3dObjects/booster/booster";
 import Area from "./3dObjects/area/area1";
+import PlayAgain from "./components/ui/playAgain/PlayAgain";
+import { AnimatePresence } from "framer-motion";
 
 export default function Home() {
-  const hitCountRef = useRef(0);
-  const hitCountContRef = useRef(null);
+  const [collisionCount, setCollisionCount] = useState(0);
+  const [restartGame, setRestartGame] = useState(() => () => {});
+  const gameSetting = useRef({
+    isPaused: false,
+    isEnd: false,
+  });
   useEffect(() => {
     // Basic Three.js setup
     const scene = new THREE.Scene();
@@ -47,28 +52,15 @@ export default function Home() {
     //sun
     const sun = new Sun();
     scene.add(sun);
-    // lights
-    // var hemisphereLight = new THREE.HemisphereLight(0xffff88, 0x000000, 0.9);
-    // scene.add(hemisphereLight);
-    // const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
-    // sun.position.set(8, 2, -7);
-    // scene.add(sun);
-    // const highlight = new THREE.DirectionalLight(0xffffff, 0.5);
-    // highlight.position.set(10, 10, 10);
-    // scene.add(highlight);
 
     const ambientLight = new THREE.AmbientLight(0xcdc1c5, 0.9);
     scene.add(ambientLight);
 
     // orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
-    // Lock orbit controls for gameplay camera behavior
-    // controls.enablePan = false;
-    // controls.enableRotate = false;
 
     // fog
     const fog = new THREE.FogExp2(0xffffff, 0.003);
-    // const fog = new THREE.Fog(0xffffff, 90, 100);
     scene.fog = fog;
 
     // ground
@@ -79,18 +71,7 @@ export default function Home() {
     const plane = new Plane();
     scene.add(plane);
 
-    // obstacles
-    const obstacles = [];
-    // for (let i = 0; i < 10; i++) {
-    //   const box = new Ball();
-    //   scene.add(box);
-    //   obstacles.push(box);
-    // }
-
-    // const g = new ObstacleGroup9();
-    // scene.add(g);
-    // g.position.z = -50;
-    // let speed
+    // obstacle areas
     const group1 = [
       new ObstacleGroup1(),
       new ObstacleGroup2(),
@@ -104,6 +85,14 @@ export default function Home() {
       new ObstacleGroup2(),
       new ObstacleGroup2(),
       new ObstacleGroup2(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
     ];
     const group2 = [
       new ObstacleGroup4(),
@@ -118,6 +107,14 @@ export default function Home() {
       new ObstacleGroup4(),
       new ObstacleGroup4(),
       new ObstacleGroup4(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
     ];
     const group3 = [
       new ObstacleGroup5(),
@@ -132,6 +129,14 @@ export default function Home() {
       new ObstacleGroup5(),
       new ObstacleGroup5(),
       new ObstacleGroup5(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
     ];
 
     const group4 = [
@@ -147,33 +152,144 @@ export default function Home() {
       new ObstacleGroup6(),
       new ObstacleGroup6(),
       new ObstacleGroup6(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
     ];
-    // const area1 = new Area(group1);
-    // scene.add(area1);
-    // area1.position.z = -400;
-    // const area2 = new Area(group2);
-    // scene.add(area2);
-    // area2.position.z = -300;
-    // const area3 = new Area(group3);
-    // scene.add(area3);
-    // area3.position.z = -200;
-    // const area4 = new Area(group4);
-    // scene.add(area4);
-    // area3.position.z = -100;
+    const group5 = [
+      new ObstacleGroup7(),
+      new ObstacleGroup7(),
+      new ObstacleGroup8(),
+      new ObstacleGroup7(),
+      new ObstacleGroup7(),
+      new ObstacleGroup8(),
+      new ObstacleGroup8(),
+      new ObstacleGroup8(),
+      new ObstacleGroup8(),
+      new ObstacleGroup7(),
+      new ObstacleGroup7(),
+      new ObstacleGroup7(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+      new Booster(),
+    ];
     const areas = [
       new Area(group1),
       new Area(group2),
       new Area(group3),
       new Area(group4),
+      new Area(group5),
     ];
+
+    // const boundingSphere = [];
+    // areas.forEach((area) => {
+    //   area.groups.forEach((group) => {
+    //     const sphere = new THREE.Mesh(
+    //       new THREE.SphereGeometry(
+    //         Math.max(group.width, group.depth, group.height) / 2,
+    //         32,
+    //         32
+    //       ),
+    //       new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+    //     );
+    //     area.add(sphere);
+    //     sphere.position.set(
+    //       group.position.x,
+    //       group.position.y,
+    //       group.position.z
+    //     );
+    //   });
+    // });
+
+    // const sphere = new THREE.Mesh(
+    //   new THREE.SphereGeometry(5, 32, 32),
+    //   new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+    // );
+
+    // sphere.position.set(plane.position.x, plane.position.y, plane.position.z);
+    // scene.add(sphere);
 
     areas.forEach((area, index) => {
       area.position.z = -(index + 1) * 100;
       scene.add(area);
     });
 
-    // rotate plane wings
-    let planePropeller = null;
+    // explosion
+    let explosionPower = 1.07;
+    let isExlpoding = false;
+    const particleCount = 20;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = Math.random() * 2 - 1;
+      positions[i * 3 + 1] = Math.random() * 2 - 1;
+      positions[i * 3 + 2] = Math.random() * 2 - 1;
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3)
+    );
+
+    const pMaterial = new THREE.PointsMaterial({
+      color: 0xff0000,
+      size: 1,
+      opacity: 0.1,
+    });
+
+    const particles = new THREE.Points(particleGeometry, pMaterial);
+    particles.position.set(
+      plane.position.x,
+      plane.position.y,
+      plane.position.z
+    );
+    scene.add(particles);
+    particles.visible = false;
+
+    function explode(type) {
+      const positions = particleGeometry.getAttribute("position").array;
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = -0.2 + Math.random() * 0.4; // x
+        positions[i * 3 + 1] = -0.2 + Math.random() * 0.4; // y
+        positions[i * 3 + 2] = -0.2 + Math.random() * 0.4; // z
+      }
+
+      particleGeometry.getAttribute("position").needsUpdate = true;
+
+      explosionPower = 1.25;
+      particles.visible = true;
+    }
+
+    function doExplosionLogic() {
+      if (!particles.visible) return;
+
+      const positionAttr = particleGeometry.getAttribute("position");
+      const positions = positionAttr.array;
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] *= explosionPower;
+        positions[i * 3 + 1] *= explosionPower;
+        positions[i * 3 + 2] *= explosionPower;
+      }
+
+      positionAttr.needsUpdate = true;
+
+      if (explosionPower > 1.005) {
+        explosionPower -= 0.001;
+      } else {
+        particles.visible = false;
+      }
+    }
 
     camera.position.set(0, 7, 10);
     camera.lookAt(0, 2, -20);
@@ -193,7 +309,6 @@ export default function Home() {
         pressed: false,
       },
     };
-
     const keydownHandler = (event) => {
       switch (event.code) {
         case "KeyA":
@@ -228,16 +343,35 @@ export default function Home() {
     window.addEventListener("keydown", keydownHandler);
     window.addEventListener("keyup", keyupHandler);
 
-    // keep track of previously collided obstacle
-    let activeCollision = new Set();
+    // restart game function
+    let restartGame = () => {
+      // reset game enviroment
+      ground.speed = 0.048;
+      areas.forEach((area) => {
+        area.speed = 1;
+      });
+      plane.propellerRotationSpeed = 0.5;
+      sun.position.y = 500;
+
+      gameSetting.current.isEnd = false;
+      // reset z position of areas
+      areas.forEach((area, index) => {
+        area.position.z = -(index + 1) * 100;
+
+        area.groups.forEach((group) => {
+          group.isCollided = false;
+        });
+      });
+
+      // reset isCollided prop of every group
+
+      setCollisionCount(0);
+      animate();
+    };
+    setRestartGame(() => restartGame);
 
     const animate = function () {
-      // rotate plane fans
-      plane.rotatePropeller();
-      // update every obstacle
-      obstacles.forEach((obstacle) => {
-        obstacle.update(obstacles);
-      });
+      if (gameSetting.current.isEnd || gameSetting.current.isPaused) return;
 
       // Make camera follow the plane horizontally and stay slightly above/behind it
       if (plane) {
@@ -258,9 +392,6 @@ export default function Home() {
       if (keys.a.pressed) {
         plane.rotateLeft();
         ground.moveLeft();
-        obstacles.forEach((obstacle) => {
-          obstacle.moveLeft();
-        });
         areas.forEach((area) => {
           area.moveLeft();
         });
@@ -268,27 +399,25 @@ export default function Home() {
         // if key d presses move to right
         plane.rotateRight();
         ground.moveRight();
-        obstacles.forEach((obstacle) => {
-          obstacle.moveRight();
-        });
         areas.forEach((area) => {
           area.moveRight();
         });
       } else if (keys.w.pressed) {
         plane.rotateUp();
         plane.moveUp();
+        plane.flapsUp();
       } else if (keys.s.pressed) {
         plane.rotateDown();
         plane.moveDown();
+        plane.flapsDown();
       }
 
-      if (!keys.w.pressed) {
+      if (!keys.w.pressed && !keys.s.pressed) {
         plane.rotateXNormal();
-      } else if (!keys.s.pressed) {
-        plane.rotateXNormal();
+        plane.flapsNormal();
       }
 
-      // udpate plane and ground with every frame
+      // reduce the velocity as sun goes down
       ground.speed -= 0.00002;
       plane.propellerRotationSpeed -= 0.00015;
       areas.forEach((area) => {
@@ -299,33 +428,54 @@ export default function Home() {
       });
       if (ground.speed != 0) fog.density += 0.000001;
 
+      //update different component of game
+      plane.rotatePropeller();
       sun.update();
       plane.update();
       ground.update();
 
-      // check for collision between plane and obstacles
+      // check for collision using bounding sphere
+      const planePos = new THREE.Vector3();
+      plane.getWorldPosition(planePos);
 
-      obstacles.forEach((obstacle) => {
-        plane.updateMatrixWorld(true);
-        const planeBoundingBox = plane.getBoundingBox();
-        obstacle.updateMatrixWorld(true);
-        const obstacleBoundingBox = obstacle.getBoundingBox();
-        if (planeBoundingBox.max.x != -Infinity) {
-          if (planeBoundingBox.intersectsBox(obstacleBoundingBox)) {
-            if (!activeCollision.has(obstacle.name)) {
-              hitCountRef.current++;
-              hitCountContRef.current.innerHTML = hitCountRef.current;
-              activeCollision.add(obstacle.name);
+      if (isExlpoding) doExplosionLogic();
+
+      areas.forEach((area) => {
+        area.groups.forEach((group) => {
+          if (!group.isCollided) {
+            const groupPos = new THREE.Vector3();
+            group.getWorldPosition(groupPos);
+
+            const planeRadius = 4;
+            const groupRadius =
+              Math.max(group.height, group.width, group.depth) / 2;
+
+            const distance = planePos.distanceTo(groupPos);
+
+            if (distance <= planeRadius + groupRadius) {
+              group.isCollided = true;
+
+              // trigger exploding animation
+              isExlpoding = true;
+              explode();
+
+              // if collided object is booster then reset the velocity of ground, obstacles and areas and reset y position of sun
+              if (group.name == "booster") {
+                ground.speed = 0.048;
+                areas.forEach((area) => {
+                  area.speed = 1;
+                });
+                plane.propellerRotationSpeed = 0.5;
+                sun.position.y = 500;
+              } else {
+                setCollisionCount((prev) => {
+                  if (prev >= 3) gameSetting.current.isEnd = true;
+                  return prev + 1;
+                });
+              }
             }
           }
-        } else {
-          // Remove obstacles that are no longer colliding
-          if (activeCollision.has(obstacle.name)) {
-            activeCollision.delete(obstacle.name);
-          }
-        }
-
-        // console.log(activeCollision);
+        });
       });
 
       requestAnimationFrame(animate);
@@ -339,11 +489,19 @@ export default function Home() {
   }, []);
   return (
     <>
-      <div style={{ position: "fixed", top: "50px", right: "50px" }}>
-        <h1>
-          <span ref={hitCountContRef}></span>
-        </h1>
+      <div
+        style={{
+          position: "fixed",
+          top: "50px",
+          right: "50px",
+          fontSize: "2rem",
+        }}
+      >
+        <p>Lives Left : {Math.max(0, 3 - collisionCount)}</p>
       </div>
+      <AnimatePresence>
+        {collisionCount >= 4 && <PlayAgain restartGame={restartGame} />}
+      </AnimatePresence>
     </>
   );
 }

@@ -25,18 +25,10 @@ class Sun extends THREE.Group {
     this.add(sun);
     this.add(glow);
     this.position.set(0, 500, -1000);
-
     this.sunsetSpeed = 0.5;
   }
   update() {
     this.position.y = Math.max(-50, this.position.y - this.sunsetSpeed);
-    if (this.position.y == 50) {
-      //   this.reset();
-    }
   }
-  //   reset() {
-  //     const targetPosition = 500;
-  //     this.position.y += (targetPosition - this.position.y) * 0.5;
-  //   }
 }
 export default Sun;

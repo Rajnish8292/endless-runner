@@ -1,11 +1,5 @@
 import * as THREE from "three";
 
-import {
-  ObstacleGroup1,
-  ObstacleGroup2,
-  ObstacleGroup3,
-} from "../obstacleGroup/obstacleGroups";
-
 class Area extends THREE.Group {
   constructor(groups) {
     super();
@@ -52,14 +46,15 @@ class Area extends THREE.Group {
     });
   }
   update() {
-    // this.groups.forEach((group) => {
-    //   group.update();
-    // });
     if (this.speed <= 0) this.speed = 0;
     this.position.z += this.speed;
-    if (this.position.z >= 50) {
-      this.position.z = -450;
-    }
+
+    this.groups.forEach((group) => {
+      if (group.name == "booster") group.rotate();
+      if (this.position.z >= 120) group.isCollided = false;
+    });
+
+    if (this.position.z >= 120) this.position.z = -450;
   }
   moveLeft() {
     if (this.speed <= 0) this.speed = 0;
@@ -67,8 +62,10 @@ class Area extends THREE.Group {
       const xPos = this.position.x + group.position.x;
       group.position.x += this.speed;
       if (xPos > 250) {
+        group.isCollided = false;
         group.position.x = -250;
       } else if (xPos < -250) {
+        group.isCollided = false;
         group.position.x = 250;
       }
     });
@@ -80,8 +77,10 @@ class Area extends THREE.Group {
       const xPos = this.position.x + group.position.x;
       group.position.x -= this.speed;
       if (xPos > 250) {
+        group.isCollided = false;
         group.position.x = -250;
       } else if (xPos < -250) {
+        group.isCollided = false;
         group.position.x = 250;
       }
     });

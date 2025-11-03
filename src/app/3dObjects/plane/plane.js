@@ -34,9 +34,10 @@ class Plane extends THREE.Group {
       this.boundingBox.copy(box);
     });
 
-    this.position.set(0, 2, 0);
+    this.position.set(0, 5, -10);
     this.planePropeller = null;
     this.propellerRotationSpeed = 0.5;
+    this.flaps = null;
   }
 
   update() {
@@ -51,11 +52,11 @@ class Plane extends THREE.Group {
     this.rotation.z += (Math.PI / 4 - this.rotation.z) * 0.4 ** 3;
   }
   moveUp() {
-    const targetY = 15;
+    const targetY = 25;
     this.position.y += (targetY - this.position.y) * 0.4 ** 3;
   }
   moveDown() {
-    const targetY = 0.5;
+    const targetY = 2;
     this.position.y += (targetY - this.position.y) * 0.4 ** 3;
   }
   rotateUp() {
@@ -70,8 +71,6 @@ class Plane extends THREE.Group {
     const targetRotation = 0;
     this.rotation.x += (targetRotation - this.rotation.x) * 0.4 ** 3;
   }
-  flapUp() {}
-  flapDown() {}
   rotatePropeller() {
     if (this.propellerRotationSpeed <= 0) this.propellerRotationSpeed = 0;
     if (!this.planePropeller) {
@@ -84,6 +83,37 @@ class Plane extends THREE.Group {
       }
     } else {
       this.planePropeller.rotation.y += this.propellerRotationSpeed;
+    }
+  }
+
+  checkFlaps() {
+    if (!this.flaps) {
+      if (this.children[0]) {
+        this.traverse((node) => {
+          if (node.name.includes("Plane003_back_0")) {
+            this.flaps = node;
+            return true;
+          }
+        });
+      }
+    } else {
+      return true;
+    }
+    return false;
+  }
+  flapsUp() {
+    if (this.checkFlaps() && this.flaps) {
+      this.flaps.rotation.x = Math.PI / 8;
+    }
+  }
+  flapsDown() {
+    if (this.checkFlaps() && this.flaps) {
+      this.flaps.rotation.x = -Math.PI / 8;
+    }
+  }
+  flapsNormal() {
+    if (this.checkFlaps() && this.flaps) {
+      this.flaps.rotation.x = 0;
     }
   }
   getBoundingBox() {

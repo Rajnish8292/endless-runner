@@ -3,3 +3,12 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+@font-face {
+  font-family: "jersey";
+  src: url("../app/fonts/Jersey10-Regular.ttf");
+}
+
+body {
+  font-family: "jersey";
+}

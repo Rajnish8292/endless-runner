@@ -29,6 +29,8 @@ class ObstacleGroup1 extends Obstacle {
     this.height = 20.4;
     this.depth = 20.0;
 
+    this.name = "obstacle_group1";
+
     this.position.set(0, 8, 0);
   }
 }
@@ -52,6 +54,8 @@ class ObstacleGroup2 extends Obstacle {
     this.width = 20.0;
     this.height = 10.0;
     this.depth = 15.0;
+
+    this.name = "obstacle_group2";
 
     this.position.set(0, 5, 0);
   }
@@ -81,6 +85,8 @@ class ObstacleGroup3 extends Obstacle {
     this.width = 26.0;
     this.height = 20.0;
     this.depth = 19.2;
+
+    this.name = "obstacle_group3";
 
     this.position.set(0, 8, 0);
   }
@@ -119,6 +125,8 @@ class ObstacleGroup4 extends Obstacle {
     this.height = 20.0;
     this.depth = 15.0;
 
+    this.name = "obstacle_group4";
+
     this.position.set(0, 5.4, 0);
   }
 }
@@ -145,6 +153,8 @@ class ObstacleGroup5 extends Obstacle {
     this.width = 20;
     this.depth = 20;
     this.height = 10;
+
+    this.name = "obstacle_group5";
   }
 }
 
@@ -170,6 +180,8 @@ class ObstacleGroup6 extends Obstacle {
     this.height = 4 * radius;
     this.depth = 2 * radius;
 
+    this.name = "obstacle_group6";
+
     this.position.set(0, 6, 0);
   }
 }
@@ -192,6 +204,8 @@ class ObstacleGroup7 extends Obstacle {
     this.width = 12;
     this.height = 16;
     this.depth = 8;
+
+    this.name = "obstacle_group7";
 
     this.position.set(0, 8, 0);
   }
@@ -221,6 +235,8 @@ class ObstacleGroup8 extends Obstacle {
     this.height = 10;
     this.depth = 2 * a;
 
+    this.name = "obstacle_group8";
+
     this.position.set(0, 5, 0);
   }
 }
@@ -240,6 +256,8 @@ class ObstacleGroup9 extends Obstacle {
     this.width = 12;
     this.height = 12;
     this.depth = 12;
+
+    this.name = "obstacle_group9";
 
     this.position.set(0, 6, 0);
   }
@@ -265,6 +283,8 @@ class ObstacleGroup10 extends Obstacle {
     this.width = 16;
     this.height = 12;
     this.depth = 8;
+
+    this.name = "obstacle_group10";
 
     this.position.set(0, 6, 0);
   }
